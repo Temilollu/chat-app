@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 import ChatBox from "react-chat-plugin";
 import EmptyImg from "../assets/emptyImage.svg";
@@ -31,19 +31,30 @@ export default function Chat() {
   ]);
 
   const handleOnSendMessage = (message) => {
-    setMessages(
-      messages.concat({
-        author: {
-          username: getUser(),
-          id: 1,
-          avatarUrl: EmptyImg,
-        },
-        text: message,
-        timestamp: +new Date(),
-        type: "text",
-      })
+    const newMessage = {
+      author: {
+        username: getUser(),
+        id: 1,
+        avatarUrl: EmptyImg,
+      },
+      text: message,
+      timestamp: +new Date(),
+      type: "text",
+    };
+    setMessages(messages.concat(newMessage));
+
+    sessionStorage.setItem(
+      "messages",
+      JSON.stringify([...messages, newMessage])
     );
   };
+
+  useEffect(() => {
+    if (sessionStorage.getItem("messages")) {
+      const storedMessages = JSON.parse(sessionStorage.getItem("messages"));
+      setMessages(storedMessages);
+    }
+  }, []);
 
   return (
     <div className="chat-container">
